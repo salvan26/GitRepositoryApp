@@ -1,0 +1,80 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body  {
+    background-color:#644bff;
+    padding: 0 20px;
+}
+
+#app{
+    width: 100%;
+    height: auto;
+    margin-top: 5%;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.repository_form {
+    max-width: 400px;
+    margin: 0 auto;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+.repository_form .repository__search {
+    height: 55px;
+    width: 100%;
+    outline: none;
+    border: none;
+    border-radius: 5px;
+    padding: 0 50px 0 20px;
+    font-size: 18px;
+    box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.1);
+}
+
+.repository_form .repository__autocomplete{
+    padding: 0px;  
+    max-height: 280px;
+    overflow-y: auto;
+}
+
+
+.repository__autocomplete li {
+    list-style: none;
+    padding: 8px 12px;
+    width: 100%;
+    cursor: default;
+    border-radius: 3px;
+}
+
+.repository__autocomplete li:hover{
+    background-color: #65CDF9;
+}
+
+.repository__list {
+    margin: 10px auto;
+}
+
+.repository__list li{
+    background-color: #E27BEB;
+    width: 400px;
+    position: relative;
+    margin: 10px auto;
+    list-style: none;
+    padding: 8px 12px;
+    cursor: default;
+    border: 2px solid purple;
+    border-radius: 3px;
+}
+
+.button-close {
+    color :brown;
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    top: 30px;
+    right: 15px;
+}

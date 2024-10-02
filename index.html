@@ -3,11 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <link href="style.css" rel="stylesheet">
+    <title>github-api-autocomplete
+    </title>
 </head>
 <body>
     <div id="app">
-        
+        <div class="repository_form">
+            <input class = "repository__search" type="text" placeholder=" wannaFindSomeRepo?" autocomplete="off">
+            <ul class = "repository__autocomplete autocomplete"></ul>
+        </div>
+        <ul class="repository__list">Added repo:</ul>  
     </div>
 <script src="index.js"></script>
 </body>
