@@ -26,51 +26,22 @@ class ApplicationView {
         return element;
     }
 
-    clearValue (element){
-        element.value = "";
+
+
+   createRepository( repData){
+           const newItem = this.createElement('li');
+           newItem.innerHTML =`<p> Name: ${name}</p>\n
+            <p> Owner: ${owner.login} </p>\n
+            <p> Stars: ${stargazers_count}</p>
+            <button"></button> `;
     }
 
-   createRepository( { name, owner, stargazers_count }){
-        return `<li class="repository__li">
-            <p class = "repository__item"> Name: ${name}</p>
-            <p class = "repository__item"> Owner: ${owner.login} </p>
-            <p class = "repository__item"> Stars: ${stargazers_count}</p>
-            <button class = "repository__button button-close"></button>
-             </li> `;
-    }
-
-    repoClickHandler(repo){
-        const repoli = createRepository(repo);
-        const newRepositoryItem = createNewElement(repoli);
-        createChild(repositoryList, newRepositoryItem);
-        const delRepoBtn = newRepositoryItem.querySelector('.button-close');
-        delRepoBtn.addEventListener('click', delBtnClickHandler);
-        clearValue(this.searchField);
-    }
-
-    createChild (parent, child){
-        parent.append(child)
-    }
-
-    delBtnClickHandler (){
-        const elem = this.parentNode;
-        repositoryList.removeChild(elem);
-    }
-
-    createNewElement(item){
-        const newElement = document.createElement('li');
-        newElement.innerHTML = item;
-        return newElement.firstChild;
-      }
-
+ 
       autocomplete(repData){
         const newItem = this.createElement('li');
-        newItem.innerHTML = `<p>${repData.name}</p>`;
-        const newElement = this.createNewElement(newItem);
+        newItem.innerHTML = <p>${repData.name}</p>;
         this.repositoryList.append(newItem);
-        this.createChild(this.repositoryList, newElement);
-        newElement.addEventListener('click', ()=> repoClickHandler(elem));
-  
+   
     }
 
     
