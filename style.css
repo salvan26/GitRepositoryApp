@@ -35,7 +35,7 @@ body  {
     box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.1);
 }
 
-.wrapper .search-field{
+.wrapper .repositoryList{
     padding: 0px;  
     max-height: 280px;
     overflow-y: auto;
@@ -54,11 +54,11 @@ body  {
     background-color: #65CDF9;
 }
 
-.repositoryList {
+.favotite-rep {
     margin: 10px auto;
 }
 
-.favotiteRep li{
+.favotite-rep li{
     background-color: #E27BEB;
     width: 400px;
     position: relative;
