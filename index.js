@@ -39,7 +39,7 @@ class ApplicationView {
  
       autocomplete(repData){
         const newItem = this.createElement('li');
-        newItem.innerHTML = <p>${repData.name}</p>;
+        newItem.innerHTML = `<p>${repData.name}</p>`;
         this.repositoryList.append(newItem);
    
     }
