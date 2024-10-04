@@ -1,64 +1,83 @@
-class ApplicationView {
-    constructor(){
-        this.app = document.getElementById('app');
-        this.searchField = this.createElement('input', 'search-field');
-        this.searchField.setAttribute('type', 'text');
-        this.searchField.setAttribute('placeholder', 'Введите текст...');
-        this.wrapper = this.createElement('div', 'wrapper');
-        this.repositoryList = this.createElement('ul', 'repositoryList');
-        this.favotiteRep = this.createElement('div', 'favotite-rep');
-        this.buttonClose = this.createElement('button', 'button-close')
-        this.wrapper.append(this.searchField);
-        this.wrapper.append(this.repositoryList);
-        
-        
-        this.app.append(this.wrapper);
-        this.app.append(this.favotiteRep);
 
-        
+
+class RepositoryManager {
+    constructor() {
+        this.searchInput = document.querySelector('.repository-search-input');
+        this.autocompleteList = document.querySelector('.repository-autocomplete-list');
+        this.repositoryList = document.querySelector('.repository-list');
+        this.repositories = [];
     }
 
-    createElement(elementTag, elementClass) {
-        const element = document.createElement(elementTag);
-        if(elementClass) {
-            element.classList.add(elementClass);
+    async searchRepositories(query) {
+        const apiResponse = await fetch(`https://api.github.com/search/repositories?q=${query}`);
+        const data = await apiResponse.json();
+        return data.items.slice(0, 5);
+    }
+
+    async loadRepositories(query) {
+        try {
+            const repositories = await Promise.all(
+                query.split(' ').map(async (term) => {
+                    const result = await this.searchRepositories(term);
+                    return result.map(repo => ({ ...repo, term }));
+                })
+            );
+            return repositories.flat().reduce((acc, repo) => acc.concat(repo), []);
+        } catch (error) {
+            console.error('Ошибка при загрузке репозиториев:', error);
+            return [];
         }
-        return element;
     }
 
-
-
-   createRepository( repData){
-           const newItem = this.createElement('li');
-           newItem.innerHTML =`<p> Name: ${name}</p>\n
-            <p> Owner: ${owner.login} </p>\n
-            <p> Stars: ${stargazers_count}</p>
-            <button"></button> `;
+    createRepositoryItem(repo) {
+        return `
+            <p>Name:${repo.name}</p>\n
+            <p>Owner:${repo.owner.login}</p>\n
+            <p>Stars:${repo.stargazers_count}</p>
+            <button class="repository-delete-button">X</button>
+        `;
     }
 
- 
-      autocomplete(repData){
-        const newItem = this.createElement('li');
-        newItem.innerHTML = `<p>${repData.name}</p>`;
-        this.repositoryList.append(newItem);
-   
+    addRepositoryToList(repo) {
+        const item = this.createRepositoryItem(repo);
+        const li = document.createElement('li');
+        li.innerHTML = item;
+        this.repositoryList.appendChild(li);
+        li.querySelector('.repository-delete-button').addEventListener('click', () => this.removeRepository(li));
+    }
+
+    removeRepository(element) {
+        element.remove();
+    }
+
+    updateAutocomplete(query) {
+        this.autocompleteList.innerHTML = '';
+        this.loadRepositories(query).then(repos => {
+            repos.forEach(repo => {
+                const li = document.createElement('li');
+                li.textContent = repo.term;
+                li.addEventListener('click', () => this.addRepositoryToList(repo));
+                this.autocompleteList.appendChild(li);
+            });
+        }).catch(error => {
+            console.error('Ошибка при обновлении автодополнения:', error);
+        });
+    }
+
+    handleInputChange(event) {
+        const query = event.target.value;
+        this.updateAutocomplete(query);
     }
 
     
-
-    
-}
-
-
-class Search {
-    constructor(ApplicationView) {
-        this.ApplicationView = ApplicationView;
-        this.ApplicationView.searchField.addEventListener('keyup', this.debounce(this.searchUsers.bind(this), 300))
+    handleEnterPress(event) {
+        if (event.key !== 'Enter') return;
+        event.preventDefault();
+        this.handleInputChange(event);
     }
 
     debounce = (fn, debounceTime) => {
         let timer;
-    
         return function (...args) {
             clearTimeout(timer);
             timer = setTimeout(() => {
@@ -66,40 +85,18 @@ class Search {
             }, debounceTime)
         }
      };
-   
-     updateUsers(response, isUpdate = false) {
-        let users;
-        if (response.ok) {
-            if (!isUpdate) {
-                this.clearField();
-            }
-            response.json().then((res) => {
-                if (res.items) {
-                    users = res.items;
-                    users.forEach(user => this.ApplicationView.autocomplete(user));
-                } else {
-                    this.clearField();
-                }
-            });
-        } else {
-            console.log('Error 1' + response.status);
-        }
-    } 
 
-    searchUsers() {
-        if (this.ApplicationView.searchField.value) {
-            this.loadUsers(this.ApplicationView.searchField.value).then(response => this.updateUsers(response))
-        } else {
-            this.clearField();
-        }
-    }
-    
-    async loadUsers(searchValue) {
-        return await fetch(`https://api.github.com/search/repositories?q=${searchValue}&per_page=5`);
-    }
-    clearField () {
-        this.ApplicationView.repositoryList.innerHTML = '';
+    init() {
+        this.searchInput.addEventListener('input', this.debounce(this.handleInputChange.bind(this), 500));
+        this.searchInput.addEventListener('keypress', this.handleEnterPress.bind(this));
+        this.repositoryList.addEventListener('click', (e) => {
+            if (e.target.classList.contains('repository-delete-button')) {
+                e.stopPropagation();
+                this.removeRepository(e.target.closest('.repository-item'));
+            }
+        });
     }
 }
 
-new Search(new ApplicationView());
+const repositoryManager = new RepositoryManager();
+repositoryManager.init();
