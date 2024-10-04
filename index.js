@@ -3,6 +3,7 @@
 class RepositoryManager {
     constructor() {
         this.searchInput = document.querySelector('.repository-search-input');
+        this.searchInput.setAttribute('placeholder', 'Поиск репозитория...')
         this.autocompleteList = document.querySelector('.repository-autocomplete-list');
         this.repositoryList = document.querySelector('.repository-list');
         this.repositories = [];
