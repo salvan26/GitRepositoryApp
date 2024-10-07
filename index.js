@@ -1,26 +1,27 @@
 
-
 class RepositoryManager {
     constructor() {
         this.searchInput = document.querySelector('.repository-search-input');
-        this.searchInput.setAttribute('placeholder', 'Поиск репозитория...')
+        this.searchInput.setAttribute('placeholder', 'Поиск репозитория...');
         this.autocompleteList = document.querySelector('.repository-autocomplete-list');
         this.repositoryList = document.querySelector('.repository-list');
         this.repositories = [];
     }
 
     async searchRepositories(query) {
-        const apiResponse = await fetch(`https://api.github.com/search/repositories?q=${query}`);
+        if (query !== "" && query !== undefined &&  query.trim()){
+        
+        const apiResponse = await fetch(`https://api.github.com/search/repositories?q=${encodeURIComponent(query)}`);
         const data = await apiResponse.json();
-        return data.items.slice(0, 5);
+        return data.items.slice(0, 5);}
     }
 
     async loadRepositories(query) {
         try {
             const repositories = await Promise.all(
-                query.split(' ').map(async (term) => {
+                [query].map(async (term) => {
                     const result = await this.searchRepositories(term);
-                    return result.map(repo => ({ ...repo, term }));
+                    return result.map(repo => ({ ...repo }));
                 })
             );
             return repositories.flat().reduce((acc, repo) => acc.concat(repo), []);
@@ -45,10 +46,16 @@ class RepositoryManager {
         li.innerHTML = item;
         this.repositoryList.appendChild(li);
         li.querySelector('.repository-delete-button').addEventListener('click', () => this.removeRepository(li));
+        this.autocompleteList.innerHTML = '';
+        this.clearInput();
     }
 
     removeRepository(element) {
         element.remove();
+    }
+
+    clearInput() {
+        this.searchInput.value = '';
     }
 
     updateAutocomplete(query) {
@@ -56,7 +63,7 @@ class RepositoryManager {
         this.loadRepositories(query).then(repos => {
             repos.forEach(repo => {
                 const li = document.createElement('li');
-                li.textContent = repo.term;
+                li.textContent = repo.name;
                 li.addEventListener('click', () => this.addRepositoryToList(repo));
                 this.autocompleteList.appendChild(li);
             });
@@ -70,7 +77,6 @@ class RepositoryManager {
         this.updateAutocomplete(query);
     }
 
-    
     handleEnterPress(event) {
         if (event.key !== 'Enter') return;
         event.preventDefault();
@@ -82,10 +88,10 @@ class RepositoryManager {
         return function (...args) {
             clearTimeout(timer);
             timer = setTimeout(() => {
-                fn.apply(this, args)
-            }, debounceTime)
-        }
-     };
+                fn.apply(this, args);
+            }, debounceTime);
+        };
+    };
 
     init() {
         this.searchInput.addEventListener('input', this.debounce(this.handleInputChange.bind(this), 500));
@@ -99,5 +105,6 @@ class RepositoryManager {
     }
 }
 
+// Создаем экземпляр класса и инициализируем его
 const repositoryManager = new RepositoryManager();
 repositoryManager.init();
